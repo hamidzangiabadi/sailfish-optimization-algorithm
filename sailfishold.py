@@ -166,7 +166,7 @@ def randomwalk(agent):
 
 
 
-datasetList = ["Lymphography"]
+datasetList = ["Amphibians"]
 
 for dt in datasetList:
     
@@ -175,7 +175,7 @@ for dt in datasetList:
 
     
 
-    df = df = pd.read_csv("../inputcsv/"+dt+".csv")
+    df = df = pd.read_csv(dt+".csv")
     a, b = np.shape(df)
 
     data = df.values[:,0:b-1]

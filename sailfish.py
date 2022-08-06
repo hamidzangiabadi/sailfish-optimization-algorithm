@@ -39,6 +39,12 @@ def global_best( pop):
         temp = i
     return temp
 
+def _get_global_best__( pop):
+    minn = 100
+    temp = pop[0]
+    # print(temp)
+    return temp
+
 # error rate
 def error_rate(xtrain, ytrain, x, opts):
     # parameters
@@ -47,6 +53,7 @@ def error_rate(xtrain, ytrain, x, opts):
     yt    = fold['yt']
     xv    = fold['xv']
     yv    = fold['yv']
+
 
 
     svm_params = x[len(x)-2:len(x)]
@@ -74,7 +81,6 @@ def error_rate(xtrain, ytrain, x, opts):
     acc     = np.sum(yvalid == ypred) / num_valid
     error   = 1 - acc
     
-    
     return error
 
 # Error rate & Feature size
@@ -89,7 +95,6 @@ def Fun(xtrain, ytrain, x, opts):
     svm_params = x[len(x)-2:len(x)]
     features = x[:]
     featuresnp = np.array(features)
-    
 
     # Original feature size
     max_feat = len(features)
@@ -97,13 +102,12 @@ def Fun(xtrain, ytrain, x, opts):
     num_feat = np.sum(features == 1)
     # Solve if no feature selected
     if num_feat == 0:
-        cost  = 1
+        cost  = 0
     else:
         # Get error rate
         error = error_rate(xtrain, ytrain, x, opts)
         # Objective function
         cost  = (alpha * error) + ( beta * (num_feat / max_feat))
-
    
     return cost
 
@@ -189,6 +193,8 @@ for dt in datasetList:
 
     for iterno in range(0, epoch):
 
+        print( "----- epoch " + str(iterno))
+
         for idx in range(0, pop_size):
             lamda_i = 2 * np.random.uniform() * PD - PD
             pos_new = sf_gbest[ID_POS] - lamda_i * ( np.random.uniform() * ( sf_gbest[ID_POS] + s_gbest[ID_POS] ) / 2 - sf_fits[idx][ID_POS] )
@@ -198,22 +204,55 @@ for dt in datasetList:
             sf_fits[idx] = new_tuple
 
         AP = AP * (1 - 2 * (epoch + 1) * epxilon)
-        print(AP)
 
         if AP < 0.5:
-            for i in range(0, s_size):
+            for i in range(0, len(s_fits)):
                 temp = (sf_gbest[ID_POS] + AP) / 2
                 pos_new = np.random.uniform() * (temp - s_fits[i][ID_POS])
                 s_pop_fit = s_fits[i][ID_FIT]
                 new_tuple = ( pos_new, s_pop_fit)
                 s_fits[i] = new_tuple
-                print(new_tuple)
         else:
-            for i in range(0, s_size):
+            for i in range(0, len(s_fits)):
                 pos_new = np.random.uniform() * (sf_gbest[ID_POS] - s_fits[i][ID_POS] + AP)
                 s_pop_fit = s_fits[i][ID_FIT]
                 new_tuple = ( pos_new, s_pop_fit)
                 s_fits[i] = new_tuple
+
         ## Recalculate the fitness of all sardine
-        
-        ############# position ha ra dar akhar binary konim
+        for i in range(0, len(s_fits)):
+            s_pop_arr = s_fits[i][ID_POS]
+            s_pop_fit = Fun(xtrain, ytrain, s_fits[i][ID_POS], opts)
+            new_tuple = (s_pop_arr, s_pop_fit)
+            s_fits[i] = new_tuple
+
+
+
+        # print(s_fits)
+
+        # Sort the population of sailfish and sardine (for reducing computational cost)
+        sf_fits = sorted(sf_fits, key=lambda temp: temp[ID_FIT])
+        s_fits = sorted(s_fits, key=lambda temp: temp[ID_FIT])
+
+    
+        for i in range(0, pop_size):
+            s_size_2 = len(s_pop)
+            if s_size_2 == 0:
+                pass
+            for j in range(0, s_size):
+                ### If there is a better solution in sardine population.
+                if sf_fits[i][ID_FIT] < s_fits[j][ID_FIT]:
+                    sf_fits[i] = deepcopy(s_fits[j])
+                    del s_fits[j]
+                break   #### This simple keyword helped reducing ton of comparing operation.
+                        #### Especially when sardine pop size >> sailfish pop size
+    
+
+        sf_current_best = _get_global_best__(sf_fits)
+        s_current_best = _get_global_best__(s_pop)
+        if sf_current_best[ID_FIT] < sf_gbest[ID_FIT]:
+            sf_gbest = np.array(deepcopy(sf_current_best),dtype=object)
+        if s_current_best[ID_FIT] < s_gbest[ID_FIT]:
+            s_gbest = np.array(deepcopy(s_current_best),dtype=object)
+
+        print(sf_current_best)
