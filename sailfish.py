@@ -1,11 +1,10 @@
-from telnetlib import SGA
-from joblib import PrintTime
 import numpy as np
 import pandas as pd
 from numpy.random import rand
 from sklearn.model_selection import train_test_split
 from sklearn import svm
 from copy import deepcopy
+import math
 
 
 def init_position(lb, ub, N, dim):
@@ -16,6 +15,13 @@ def init_position(lb, ub, N, dim):
         # X[i,dim-1] = random.uniform(1,35000) # for c
         # X[i,dim-2] = random.uniform(1,32)    # for gamma 
     return X
+
+def sigmoid1(gamma):
+    #print(gamma)
+    if gamma < 0:
+        return 1 - 1/(1 + math.exp(gamma))
+    else:
+        return 1/(1 + math.exp(-gamma))
 
 def sigmoid(x):
     return 1.0/(1 + np.exp(-x))
@@ -28,6 +34,24 @@ def binary_conversion(X, dim):
         else:
             Xbin[d] = 0
     
+    return Xbin
+
+
+def binary_conversion1(X, thres, N, dim):
+    Xbin = np.zeros([N, dim], dtype='int')
+    
+    for i in range(N):
+        for d in range(dim - 2):
+            if X[i,d] > thres:
+                Xbin[i,d] = 1
+            else:
+                Xbin[i,d] = 0
+
+        #for svm params
+        Xbin[i,dim-1] = X[i,dim-1]
+        Xbin[i,dim-2] = X[i,dim-2]
+        print(X[i,dim-1])
+
     return Xbin
 
 def global_best( pop):
@@ -102,7 +126,7 @@ def Fun(xtrain, ytrain, x, opts):
     num_feat = np.sum(features == 1)
     # Solve if no feature selected
     if num_feat == 0:
-        cost  = 0
+        cost  = 1
     else:
         # Get error rate
         error = error_rate(xtrain, ytrain, x, opts)
@@ -152,6 +176,9 @@ for dt in datasetList:
     sf_pop = init_position(lb, ub, pop_size, dim)
     s_pop  = init_position(lb, ub, s_size, dim)
 
+    sf_pop = binary_conversion1(sf_pop,0.5,pop_size,dim)
+    s_pop = binary_conversion1(s_pop,0.5,s_size,dim)
+    
 
     ######## for fitness 
     
@@ -241,12 +268,13 @@ for dt in datasetList:
                 pass
             for j in range(0, s_size):
                 ### If there is a better solution in sardine population.
-                if sf_fits[i][ID_FIT] < s_fits[j][ID_FIT]:
+                if sf_fits[i][ID_FIT] > s_fits[j][ID_FIT]:
                     sf_fits[i] = deepcopy(s_fits[j])
                     del s_fits[j]
                 break   #### This simple keyword helped reducing ton of comparing operation.
                         #### Especially when sardine pop size >> sailfish pop size
-    
+
+            
 
         sf_current_best = _get_global_best__(sf_fits)
         s_current_best = _get_global_best__(s_pop)
@@ -255,4 +283,8 @@ for dt in datasetList:
         if s_current_best[ID_FIT] < s_gbest[ID_FIT]:
             s_gbest = np.array(deepcopy(s_current_best),dtype=object)
 
-        print(sf_current_best)
+        
+        x = sigmoid(sf_gbest[0])
+        x = binary_conversion(sf_gbest[0],dim)
+        print(binary_conversion(sf_gbest[0],dim))
+        print(sf_gbest[1])
