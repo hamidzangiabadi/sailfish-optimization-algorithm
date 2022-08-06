@@ -136,7 +136,7 @@ def Fun(xtrain, ytrain, x, opts):
     return cost
 
 
-datasetList = ["Amphibians"]
+datasetList = ["Zoo"]
 
 for dt in datasetList:
     
@@ -155,7 +155,7 @@ for dt in datasetList:
     opts = {'fold':fold, 'DT' : dt}
     
     # parameters
-    epoch = 50
+    epoch = 100
     pop_size = 10
     pp = 0.12
     A, epxilon = 2, 0.001
@@ -261,6 +261,7 @@ for dt in datasetList:
         sf_fits = sorted(sf_fits, key=lambda temp: temp[ID_FIT])
         s_fits = sorted(s_fits, key=lambda temp: temp[ID_FIT])
 
+        print(sf_fits)
     
         for i in range(0, pop_size):
             s_size_2 = len(s_pop)
@@ -274,7 +275,10 @@ for dt in datasetList:
                 break   #### This simple keyword helped reducing ton of comparing operation.
                         #### Especially when sardine pop size >> sailfish pop size
 
-            
+        
+        # need to modify
+        # s_fits = s_fits + create_population(self.s_size - len(self.s_pop))
+        # _, self.s_gbest = self.get_global_best_solution(self.s_pop)
 
         sf_current_best = _get_global_best__(sf_fits)
         s_current_best = _get_global_best__(s_pop)
@@ -288,3 +292,4 @@ for dt in datasetList:
         x = binary_conversion(sf_gbest[0],dim)
         print(binary_conversion(sf_gbest[0],dim))
         print(sf_gbest[1])
+
