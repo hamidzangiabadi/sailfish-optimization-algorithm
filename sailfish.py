@@ -255,13 +255,11 @@ for dt in datasetList:
 
 
 
-        # print(s_fits)
+
 
         # Sort the population of sailfish and sardine (for reducing computational cost)
         sf_fits = sorted(sf_fits, key=lambda temp: temp[ID_FIT])
         s_fits = sorted(s_fits, key=lambda temp: temp[ID_FIT])
-
-        print(sf_fits)
     
         for i in range(0, pop_size):
             s_size_2 = len(s_pop)
@@ -275,13 +273,11 @@ for dt in datasetList:
                 break   #### This simple keyword helped reducing ton of comparing operation.
                         #### Especially when sardine pop size >> sailfish pop size
 
-        
-        # need to modify
-        # s_fits = s_fits + create_population(self.s_size - len(self.s_pop))
-        # _, self.s_gbest = self.get_global_best_solution(self.s_pop)
 
         sf_current_best = _get_global_best__(sf_fits)
         s_current_best = _get_global_best__(s_pop)
+        print(sf_current_best[ID_FIT])
+        print(sf_gbest[ID_FIT])
         if sf_current_best[ID_FIT] < sf_gbest[ID_FIT]:
             sf_gbest = np.array(deepcopy(sf_current_best),dtype=object)
         if s_current_best[ID_FIT] < s_gbest[ID_FIT]:
@@ -290,6 +286,5 @@ for dt in datasetList:
         
         x = sigmoid(sf_gbest[0])
         x = binary_conversion(sf_gbest[0],dim)
-        print(binary_conversion(sf_gbest[0],dim))
         print(sf_gbest[1])
 
