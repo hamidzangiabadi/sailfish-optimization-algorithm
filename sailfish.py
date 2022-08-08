@@ -155,9 +155,9 @@ for dt in datasetList:
     opts = {'fold':fold, 'DT' : dt}
     
     # parameters
-    epoch = 100
-    pop_size = 10
-    pp = 0.12
+    epoch = 50
+    pop_size = 100
+    pp = 0.2
     A, epxilon = 2, 0.001
     lb = 0
     ub = 1
@@ -176,8 +176,7 @@ for dt in datasetList:
     sf_pop = init_position(lb, ub, pop_size, dim)
     s_pop  = init_position(lb, ub, s_size, dim)
 
-    sf_pop = binary_conversion1(sf_pop,0.5,pop_size,dim)
-    s_pop = binary_conversion1(s_pop,0.5,s_size,dim)
+    
     
 
     ######## for fitness 
@@ -214,8 +213,8 @@ for dt in datasetList:
     nfe_epoch = 0
     pop_new = []
     PD = 1 - pop_size / (pop_size + s_size)
-    AP = 1.5
-    epxilon = 0.001
+    AP = 2
+    epxilon = 0.0001
 
 
     for iterno in range(0, epoch):
@@ -253,6 +252,11 @@ for dt in datasetList:
             new_tuple = (s_pop_arr, s_pop_fit)
             s_fits[i] = new_tuple
 
+        # for i in range(0, len(sf_fits)):
+        #     s_pop_arr = sf_fits[i][ID_POS]
+        #     s_pop_fit = Fun(xtrain, ytrain, sf_fits[i][ID_POS], opts)
+        #     new_tuple = (s_pop_arr, s_pop_fit)
+        #     sf_fits[i] = new_tuple
 
 
 
@@ -260,6 +264,8 @@ for dt in datasetList:
         # Sort the population of sailfish and sardine (for reducing computational cost)
         sf_fits = sorted(sf_fits, key=lambda temp: temp[ID_FIT])
         s_fits = sorted(s_fits, key=lambda temp: temp[ID_FIT])
+
+        print(sf_fits)
     
         for i in range(0, pop_size):
             s_size_2 = len(s_pop)
@@ -267,7 +273,7 @@ for dt in datasetList:
                 pass
             for j in range(0, s_size):
                 ### If there is a better solution in sardine population.
-                if sf_fits[i][ID_FIT] > s_fits[j][ID_FIT]:
+                if sf_fits[i][ID_FIT] > s_fits[j][ID_FIT]: # need to modify
                     sf_fits[i] = deepcopy(s_fits[j])
                     del s_fits[j]
                 break   #### This simple keyword helped reducing ton of comparing operation.
@@ -276,8 +282,6 @@ for dt in datasetList:
 
         sf_current_best = _get_global_best__(sf_fits)
         s_current_best = _get_global_best__(s_pop)
-        #test
-        #test 2
         if sf_current_best[ID_FIT] < sf_gbest[ID_FIT]:
             sf_gbest = np.array(deepcopy(sf_current_best),dtype=object)
         if s_current_best[ID_FIT] < s_gbest[ID_FIT]:
