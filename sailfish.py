@@ -277,7 +277,7 @@ for dt in datasetList:
         sf_current_best = _get_global_best__(sf_fits)
         s_current_best = _get_global_best__(s_pop)
         #test
-
+        #test 2
         if sf_current_best[ID_FIT] < sf_gbest[ID_FIT]:
             sf_gbest = np.array(deepcopy(sf_current_best),dtype=object)
         if s_current_best[ID_FIT] < s_gbest[ID_FIT]:
