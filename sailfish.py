@@ -50,7 +50,7 @@ def binary_conversion1(X, thres, N, dim):
         #for svm params
         Xbin[i,dim-1] = X[i,dim-1]
         Xbin[i,dim-2] = X[i,dim-2]
-        print(X[i,dim-1])
+        # print(X[i,dim-1])
 
     return Xbin
 
@@ -107,6 +107,34 @@ def error_rate(xtrain, ytrain, x, opts):
     
     return error
 
+
+def accuracy(xtrain, ytrain, x, opts):
+    
+    dim = np.size(xtrain, 1) 
+    x = binary_conversion(x,dim)
+    # Parameters
+    alpha = 0.6 # related to error
+    beta = 0.4  # related to number of features
+
+    svm_params = x[len(x)-2:len(x)]
+    features = x[:]
+    featuresnp = np.array(features)
+
+    # Original feature size
+    max_feat = len(features)
+    # Number of selected features
+    num_feat = np.sum(features == 1)
+    # Solve if no feature selected
+    if num_feat == 0:
+        cost  = 1
+    else:
+        # Get error rate
+        error = error_rate(xtrain, ytrain, x, opts)
+        # Objective function
+        cost  = 1 - error
+   
+    return cost
+
 # Error rate & Feature size
 def Fun(xtrain, ytrain, x, opts):
 
@@ -136,7 +164,7 @@ def Fun(xtrain, ytrain, x, opts):
     return cost
 
 
-datasetList = ["Zoo"]
+datasetList = ["Tictactoe"]
 
 for dt in datasetList:
     
@@ -155,10 +183,10 @@ for dt in datasetList:
     opts = {'fold':fold, 'DT' : dt}
     
     # parameters
-    epoch = 50
-    pop_size = 100
-    pp = 0.2
-    A, epxilon = 2, 0.001
+    epoch = 10
+    pop_size = 50
+    pp = 0.1
+    A, epxilon = 4, 0.001
     lb = 0
     ub = 1
 
@@ -212,7 +240,7 @@ for dt in datasetList:
 
     nfe_epoch = 0
     pop_new = []
-    PD = 1 - pop_size / (pop_size + s_size)
+    PD = 2
     AP = 2
     epxilon = 0.0001
 
@@ -223,16 +251,21 @@ for dt in datasetList:
 
         for idx in range(0, pop_size):
             lamda_i = 2 * np.random.uniform() * PD - PD
+            # print("before")
+            # print(sf_fits[idx])
+            #Eq. 6
             pos_new = sf_gbest[ID_POS] - lamda_i * ( np.random.uniform() * ( sf_gbest[ID_POS] + s_gbest[ID_POS] ) / 2 - sf_fits[idx][ID_POS] )
-            
             sf_pop_fit = sf_fits[idx][ID_FIT]
             new_tuple = (pos_new, sf_pop_fit)
             sf_fits[idx] = new_tuple
+            # print("after")
+            # print(sf_fits[idx])
 
         AP = AP * (1 - 2 * (epoch + 1) * epxilon)
 
         if AP < 0.5:
             for i in range(0, len(s_fits)):
+
                 temp = (sf_gbest[ID_POS] + AP) / 2
                 pos_new = np.random.uniform() * (temp - s_fits[i][ID_POS])
                 s_pop_fit = s_fits[i][ID_FIT]
@@ -240,6 +273,8 @@ for dt in datasetList:
                 s_fits[i] = new_tuple
         else:
             for i in range(0, len(s_fits)):
+                # Eq 9
+
                 pos_new = np.random.uniform() * (sf_gbest[ID_POS] - s_fits[i][ID_POS] + AP)
                 s_pop_fit = s_fits[i][ID_FIT]
                 new_tuple = ( pos_new, s_pop_fit)
@@ -265,7 +300,6 @@ for dt in datasetList:
         sf_fits = sorted(sf_fits, key=lambda temp: temp[ID_FIT])
         s_fits = sorted(s_fits, key=lambda temp: temp[ID_FIT])
 
-        print(sf_fits)
     
         for i in range(0, pop_size):
             s_size_2 = len(s_pop)
@@ -289,6 +323,11 @@ for dt in datasetList:
 
         
         x = sigmoid(sf_gbest[0])
-        x = binary_conversion(sf_gbest[0],dim)
-        print(sf_gbest[1])
+        fittestSol = sf_gbest
+        fittestSol_Accuracy = accuracy(xtrain, ytrain, sf_gbest[ID_POS], opts)
+        fittestSol_Fit = Fun(xtrain, ytrain, sf_gbest[ID_POS], opts)
+        dim1 = np.size(xtrain, 1) 
+        print("best subset : " + str(binary_conversion(X=fittestSol[0],dim= dim )))
+        print("best accuracy : " + str(fittestSol_Accuracy))
+        print("best Fit : " + str(fittestSol_Fit))
 
