@@ -164,12 +164,12 @@ def Fun(xtrain, ytrain, x, opts):
     return cost
 
 
-datasetList = ["Tictactoe"]
+datasetList = ["BreastCancer","Heart","LungCancer","Lymphography","Tictactoe","Zoo","Sonar"]
 
 for dt in datasetList:
     
     # load data
-    data  = pd.read_csv(dt+".csv")
+    data  = pd.read_csv("./datasets/"+dt+".csv")
     data  = data.values
     feat  = np.asarray(data[:, 0:-1])
     label = np.asarray(data[:, -1])
@@ -183,7 +183,7 @@ for dt in datasetList:
     opts = {'fold':fold, 'DT' : dt}
     
     # parameters
-    epoch = 10
+    epoch = 50
     pop_size = 50
     pp = 0.1
     A, epxilon = 4, 0.001
@@ -244,6 +244,7 @@ for dt in datasetList:
     AP = 2
     epxilon = 0.0001
 
+    f = open("./outputs/"+dt+".txt", "w")
 
     for iterno in range(0, epoch):
 
@@ -330,4 +331,7 @@ for dt in datasetList:
         print("best subset : " + str(binary_conversion(X=fittestSol[0],dim= dim )))
         print("best accuracy : " + str(fittestSol_Accuracy))
         print("best Fit : " + str(fittestSol_Fit))
+
+        f.write(str( iterno + 1)+";"+str(str(fittestSol_Accuracy))+";"+str(str(fittestSol_Fit))+";"+"\n")
+        # output in file
 
