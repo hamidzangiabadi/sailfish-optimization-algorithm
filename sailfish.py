@@ -185,7 +185,7 @@ for dt in datasetList:
     
     # parameters
     epoch = 50
-    pop_size = 50
+    pop_size = 70
     pp = 0.1
     A, epxilon = 4, 0.001
     lb = 0
