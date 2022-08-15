@@ -336,6 +336,6 @@ for dt in datasetList:
         print("best Fit : " + str(fittestSol_Fit))
         print("features count : " + str(featuresCount))
 
-        f.write(str( iterno + 1)+";"+str(fittestSol_Accuracy)+";"+str(fittestSol_Fit))+";"+str(featuresCount)+";"+"\n")
+        f.write(str( iterno + 1)+";"+str(fittestSol_Accuracy)+";"+str(fittestSol_Fit)+";"+ str(featuresCount) +";"+"\n")
         # output in file
 
