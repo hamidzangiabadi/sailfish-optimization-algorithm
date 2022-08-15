@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import svm
 from copy import deepcopy
 import math
+import random
 
 
 def init_position(lb, ub, N, dim):
@@ -192,6 +193,7 @@ for dt in datasetList:
 
     ID_POS = 0
     ID_FIT = 1
+    ID_SVM_PARAM = 2
 
     s_size = int(pop_size / pp)
 
@@ -214,6 +216,7 @@ for dt in datasetList:
 
     
     ######## calculate fitness of population
+
     for i in range(pop_size):
         sf_fit = np.append(sf_fit, Fun(xtrain, ytrain, sf_pop[i,:], opts))
     
@@ -228,8 +231,6 @@ for dt in datasetList:
     #### sf_fit = sailfish fitness
     #### s_fits = sardines with fitness matrix
     #### s_fit = sardines fitness
-
-
     # g_best = sailfish
     #  s_gbest = sardines
 
@@ -328,10 +329,13 @@ for dt in datasetList:
         fittestSol_Accuracy = accuracy(xtrain, ytrain, sf_gbest[ID_POS], opts)
         fittestSol_Fit = Fun(xtrain, ytrain, sf_gbest[ID_POS], opts)
         dim1 = np.size(xtrain, 1) 
-        print("best subset : " + str(binary_conversion(X=fittestSol[0],dim= dim )))
+        selectedFeaturesSubset = binary_conversion(X=fittestSol[0],dim= dim )
+        featuresCount = int(sum(selectedFeaturesSubset))
+        print("best subset : " + str(selectedFeaturesSubset))
         print("best accuracy : " + str(fittestSol_Accuracy))
         print("best Fit : " + str(fittestSol_Fit))
+        print("features count : " + str(featuresCount))
 
-        f.write(str( iterno + 1)+";"+str(str(fittestSol_Accuracy))+";"+str(str(fittestSol_Fit))+";"+"\n")
+        f.write(str( iterno + 1)+";"+str(fittestSol_Accuracy)+";"+str(fittestSol_Fit))+";"+str(featuresCount)+";"+"\n")
         # output in file
 
