@@ -136,6 +136,11 @@ def accuracy(xtrain, ytrain, x, opts):
    
     return cost
 
+def generateSVMParams():
+    svmParams = (random.uniform(1,35000),random.uniform(1,32))
+    return svmParams
+
+
 # Error rate & Feature size
 def Fun(xtrain, ytrain, x, opts):
 
@@ -214,13 +219,20 @@ for dt in datasetList:
     sf_fit   = np.array([],dtype=object)
     s_fit    = np.array([],dtype=object)
 
+    svm_param_gamma  = np.array([],dtype=object)
+    svm_param_c   = np.array([],dtype=object)
     
     ######## calculate fitness of population
 
     for i in range(pop_size):
         sf_fit = np.append(sf_fit, Fun(xtrain, ytrain, sf_pop[i,:], opts))
+        svm_param_c = np.append(svm_param_c, random.uniform(1,35000)) #c param in svm
+        svm_param_gamma = np.append(svm_param_gamma,random.uniform(1,32)) #gamma param in svm
+
+    sf_fits = list(zip(sf_pop, sf_fit,svm_param_c,svm_param_gamma))
+
+    print(sf_fits)
     
-    sf_fits = list(zip(sf_pop, sf_fit))
     
     for i in range(s_size):
         s_fit = np.append(s_fit, Fun(xtrain, ytrain, s_pop[i,:], opts))
