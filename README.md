@@ -1,3 +1,3 @@
 # sailfishOptimizer
 
-A multi-objective feature selection algorithm using Sailfish optimizer
+A feature selection algorithm using Sailfish optimizer and SVM
